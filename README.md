@@ -161,14 +161,15 @@ Translations of the guide are available in the following languages:
 
   ```ruby
   # bad
+  FooError = Class.new(StandardError)
+
+  # good
   class FooError < StandardError
   end
 
-  # okish
+  # good
   class FooError < StandardError; end
 
-  # good
-  FooError = Class.new(StandardError)
   ```
 
 * <a name="no-single-line-methods"></a>
@@ -357,7 +358,7 @@ Translations of the guide are available in the following languages:
     calc_something_else
   end
 
-  # good - it's apparent what's going on
+  # bad - difficult to make the indentation
   kind = case year
          when 1850..1889 then 'Blues'
          when 1890..1909 then 'Ragtime'
@@ -511,6 +512,13 @@ Translations of the guide are available in the following languages:
 
   # good
   some_method(size, count, color)
+
+  # good - only in the case there are many paramaters
+  some_method(
+    size,
+    count,
+    color
+  )
   ```
 
 * <a name="spaces-around-equals"></a>
@@ -543,12 +551,18 @@ Translations of the guide are available in the following languages:
   result = 1 - \
            2
 
-  # good (but still ugly as hell)
+  # bad (too ugly)
   result = 1 \
            - 2
 
+  # bad (difficult to indent)
   long_string = 'First part of the long string' \
                 ' and second part of the long string'
+
+  # good
+  long_string =
+    'First part of the long string' \
+    ' and second part of the long string'
   ```
 
 * <a name="consistent-multi-line-chains"></a>
@@ -565,8 +579,14 @@ Translations of the guide are available in the following languages:
     one.two.three.
       four
 
-    # good - it's immediately clear what's going on the second line
+    # okish - it's immediately clear what's going on the second line
     one.two.three
+      .four
+
+    # good - if chain need to be splited let's do it in all links
+    one
+      .two
+      .three
       .four
     ```
 
@@ -579,13 +599,21 @@ Translations of the guide are available in the following languages:
     one.two.three
       .four
 
-    # good - it's immediately clear that the expression continues beyond the first line
+    # okish - it's immediately clear that the expression continues beyond the first line
     one.two.three.
+      four
+
+    # good - if chain need to be splited let's do it in all links
+    one.
+      two.
+      three.
       four
     ```
 
   A discussion on the merits of both alternative styles can be found
   [here](https://github.com/bbatsov/ruby-style-guide/pull/176).
+
+  Using **Option B** allow us to write code that can be easily copy&pasted in a console. And [more](https://github.com/bbatsov/ruby-style-guide/pull/176#issuecomment-20421523).
 
 * <a name="no-double-indent"></a>
     Align the parameters of a method call if they span more than one
@@ -609,7 +637,7 @@ Translations of the guide are available in the following languages:
         body: source.text)
   end
 
-  # good
+  # bad (difficult to indent)
   def send_mail(source)
     Mailer.deliver(to: 'bob@example.com',
                    from: 'us@example.com',
@@ -637,16 +665,16 @@ Translations of the guide are available in the following languages:
   menu_item = ['Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam',
     'Baked beans', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam']
 
+  # bad (difficult to see if the array is open an close properly)
+  menu_item =
+    ['Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam',
+     'Baked beans', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam']
+
   # good
   menu_item = [
     'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam',
     'Baked beans', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam'
   ]
-
-  # good
-  menu_item =
-    ['Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam',
-     'Baked beans', 'Spam', 'Spam', 'Spam', 'Spam', 'Spam']
   ```
 
 * <a name="underscores-in-numerics"></a>
@@ -684,12 +712,12 @@ Translations of the guide are available in the following languages:
   ```
 
 * <a name="rdoc-conventions"></a>
-    Use [Rdoc][rdoc] and its conventions for API documentation.  Don't put an
-    empty line between the comment block and the `def`.
+  Use [Rdoc][rdoc] and its conventions for API documentation. Don't put an
+  empty line between the comment block and the `def`.
 <sup>[[link](#rdoc-conventions)]</sup>
 
 * <a name="80-character-limits"></a>
-  Limit lines to 80 characters.
+  Don't limit lines to 80 characters artificially, we are not in the 80 characters width monitors any more.
 <sup>[[link](#80-character-limits)]</sup>
 
 * <a name="no-trailing-whitespace"></a>
@@ -701,8 +729,8 @@ Translations of the guide are available in the following languages:
 <sup>[[link](#newline-eof)]</sup>
 
 * <a name="no-block-comments"></a>
-    Don't use block comments. They cannot be preceded by whitespace and are not
-    as easy to spot as regular comments.
+  Don't use block comments. They cannot be preceded by whitespace and are not
+  as easy to spot as regular comments.
 <sup>[[link](#no-block-comments)]</sup>
 
   ```ruby
@@ -831,7 +859,7 @@ Translations of the guide are available in the following languages:
 
   * Methods that have "keyword" status in Ruby, but are not declarative:
 
-    ```Ruby
+    ```ruby
     # good
     puts(temperance.age)
     system('ls')
@@ -941,6 +969,8 @@ Translations of the guide are available in the following languages:
   first, *_ending = foo.split(',')
   ```
 
+  Best practice: avoid completely the use of this insane assignation technique.
+
 * <a name="no-for-loops"></a>
     Do not use `for`, unless you know exactly why. Most of the time iterators
     should be used instead. `for` is implemented in terms of `each` (so you're
@@ -1001,6 +1031,18 @@ Translations of the guide are available in the following languages:
     do_something
     do_something_else
   end
+
+  # good - exception, when the condition is too long
+  if(
+    condition_1 &&
+    condition_2 &&
+    condition_3
+  )
+    do_something
+    do_something_else
+  end
+
+
   ```
 
 * <a name="ternary-operator"></a>
@@ -1091,7 +1133,7 @@ Translations of the guide are available in the following languages:
   ```
 
 * <a name="no-bang-bang"></a>
-  Avoid the use of `!!`.
+  Avoid the use of `!!` in control expression evaluations.
 <sup>[[link](#no-bang-bang)]</sup>
 
   `!!` converts a value to boolean, but you don't need this explicit
@@ -1113,6 +1155,26 @@ Translations of the guide are available in the following languages:
     # body omitted
   end
   ```
+
+* <a name="no-bang-bang"></a>
+  Use of `!!` in boolean expected returning value methods
+<sup>[[link](#no-bang-bang)]</sup>
+
+  If a method is expected to return a boolean better to return a
+  real boolean than a compatible expression.
+
+  ```ruby
+  # bad - returns Integer
+  def is_this_true?
+    1
+  end
+
+  # good - returns TrueClass
+  def is_this_true?
+    !!1
+  end
+  ```
+
 
 * <a name="no-and-or-or"></a>
   The `and` and `or` keywords are banned. The minimal added readability is just
@@ -1196,21 +1258,25 @@ Translations of the guide are available in the following languages:
   ```
 
 * <a name="unless-for-negatives"></a>
-  Favor `unless` over `if` for negative conditions (or control flow `||`).
+  Favor `if !` over `unless` for negative conditions (or control flow `||`).
 <sup>[[link](#unless-for-negatives)]</sup>
 
   ```ruby
   # bad
-  do_something if !some_condition
-
-  # bad
   do_something if not some_condition
 
-  # good
+  # bad - the negative conditional is more indirect and because of that more difficult to read
   do_something unless some_condition
 
-  # another good option
+  # extremly bad - double negation
+  do_something unless !other_condition
+
+  # bad - too hacky
   some_condition || do_something
+
+  # good
+  do_something if !some_condition
+
   ```
 
 * <a name="no-else-with-unless"></a>
@@ -1245,6 +1311,11 @@ Translations of the guide are available in the following languages:
 
   # good
   if x > 10
+    # body omitted
+  end
+
+  # good - exception: if there are many conditions
+  if(x > 10 || y < 100)
     # body omitted
   end
   ```
@@ -1291,15 +1362,15 @@ condition](#safe-assignment-in-condition).
   ```
 
 * <a name="until-for-negatives"></a>
-  Favor `until` over `while` for negative conditions.
+  Favor `while !` over `until` for negative conditions.
 <sup>[[link](#until-for-negatives)]</sup>
 
   ```ruby
-  # bad
-  do_something while !some_condition
-
-  # good
+  # bad - error prone, mights cause reading issues.
   do_something until some_condition
+
+  # good - we don't need to switch our brain to a negative context
+  do_something while !some_condition
   ```
 
 * <a name="infinite-loop"></a>
@@ -1338,7 +1409,7 @@ condition](#safe-assignment-in-condition).
   loop do
     puts val
     val += 1
-    break unless val < 0
+    break if val >= 0
   end
   ```
 
@@ -1498,14 +1569,14 @@ condition](#safe-assignment-in-condition).
 
     # bad
     def do_something(options = {})
-      unless options[:when] == :later
+      if options[:when] != :later
         output(self.options[:message])
       end
     end
 
     # good
     def do_something(params = {})
-      unless params[:when] == :later
+      if params[:when] != :later
         output(options[:message])
       end
     end
@@ -1526,7 +1597,7 @@ condition](#safe-assignment-in-condition).
     # some code
   end
 
-  # good (MRI would still complain, but RuboCop won't)
+  # bad (MRI would still complain, but RuboCop won't)
   if (v = array.grep(/foo/))
     do_something(v)
     # some code
@@ -1571,7 +1642,7 @@ condition](#safe-assignment-in-condition).
   name = name ? name : 'Bozhidar'
 
   # bad
-  name = 'Bozhidar' unless name
+  name = 'Bozhidar' if !name
 
   # good - set name to 'Bozhidar', only if it's nil or false
   name ||= 'Bozhidar'
@@ -2022,9 +2093,9 @@ no parameters.
 
   # good
   def compute_thing(thing)
-    return unless thing[:foo]
+    return if !thing[:foo]
     update_with_bar(thing[:foo])
-    return re_compute(thing) unless thing[:foo][:bar]
+    return re_compute(thing) if !thing[:foo][:bar]
     partial_compute(thing)
   end
   ```
@@ -2041,7 +2112,7 @@ no parameters.
 
   # good
   [0, 1, 2, 3].each do |item|
-    next unless item > 1
+    next if item < 2
     puts item
   end
   ```
@@ -2122,6 +2193,22 @@ no parameters.
   salary = 1_000
   ```
 
+* <a name="verbose-identifiers"></a>
+  Name identifiers in a verbose way over minified version.
+<sup>[[link](#verbose-identifiers)]</sup>
+
+  ```ruby
+  # bad (no self documented)
+  m = 1_000
+
+  # good - self documented
+  money = 1_000
+
+  # good - even better
+  money_to_be_paid = 1_000
+
+  ```
+
 * <a name="snake-case-symbols-methods-vars"></a>
   Use `snake_case` for symbols, methods and variables.
 <sup>[[link](#snake-case-symbols-methods-vars)]</sup>
@@ -2155,25 +2242,31 @@ no parameters.
   ```
 
 * <a name="snake-case-symbols-methods-vars-with-numbers"></a>
-  Do not separate numbers from letters on symbols, methods and variables.
+  Do separate numbers from letters on symbols, methods and variables. This makes
+  easier to read and group when there are several item in the list. The number
+  is just a sufix, as `_active` or `_deleted`
 <sup>[[link](#snake-case-symbols-methods-vars-with-numbers)]</sup>
 
   ```ruby
   # bad
-  :some_sym_1
+  :some_sym1
+  :some_sym2
 
-  some_var_1 = 1
+  some_var1 = 1
+  some_var2 = 2
 
-  def some_method_1
+  def some_method1
     # some code
   end
 
   # good
-  :some_sym1
+  :some_sym_1
+  :some_sym_2
 
-  some_var1 = 1
+  some_var_1 = 1
+  some_var_2 = 2
 
-  def some_method1
+  def some_method_1
     # some code
   end
   ```
@@ -2649,7 +2742,7 @@ no parameters.
   which depends on the module nesting at the point of definition.
   <sup>[[link](#namespace-definition)]</sup>
 
-  ```Ruby
+  ```ruby
   module Utilities
     class Queue
     end
@@ -2711,7 +2804,8 @@ no parameters.
 
 * <a name="module-function"></a>
   Favor the use of `module_function` over `extend self` when you want to turn
-  a module's instance methods into class methods.
+  a module's instance methods into class methods. Better than that use the `self.`
+  prefix to define `module_functions`.
 <sup>[[link](#module-function)]</sup>
 
   ```ruby
@@ -2728,7 +2822,7 @@ no parameters.
     end
   end
 
-  # good
+  # bad (still not properly self documented)
   module Utilities
     module_function
 
@@ -2737,6 +2831,17 @@ no parameters.
     end
 
     def other_utility_method(number, string)
+      # do some more stuff
+    end
+  end
+
+  # good - each method has it own self identification as module_function
+  module Utilities
+    def self.parse_something(string)
+      # do stuff here
+    end
+
+    def self.other_utility_method(number, string)
       # do some more stuff
     end
   end
@@ -2997,6 +3102,9 @@ no parameters.
   end
   ```
 
+  There is room to improve here, it is not clear in a crowed code to differentiate what
+  methods are private and what not.
+
 * <a name="def-self-class-methods"></a>
   Use `def self.method` to define class methods. This makes the code
   easier to refactor since the class name is not repeated.
@@ -3009,13 +3117,7 @@ no parameters.
       # body omitted
     end
 
-    # good
-    def self.some_other_method
-      # body omitted
-    end
-
-    # Also possible and convenient when you
-    # have to define many class methods.
+    # bad (convenient when you have to define many class methods but bad)
     class << self
       def first_method
         # body omitted
@@ -3024,6 +3126,11 @@ no parameters.
       def second_method_etc
         # body omitted
       end
+    end
+
+    # good
+    def self.some_other_method
+      # body omitted
     end
   end
   ```
@@ -3122,7 +3229,7 @@ no parameters.
     # ...other methods...
   end
   ```
-  
+
 ## Exceptions
 
 * <a name="prefer-raise-over-fail"></a>
@@ -3317,6 +3424,16 @@ no parameters.
   end
   ```
 
+  What forces us to not use `Exception` as the main class for our custom errors:
+
+  ```ruby
+  # bad
+  class MyException < Exception; end
+
+  # good
+  class MyError < StandardError; end
+  ```
+
 * <a name="exception-ordering"></a>
   Put more specific exceptions higher up the rescue chain, otherwise they'll
   never be rescued from.
@@ -3399,31 +3516,29 @@ resource cleanup when possible.
   ```
 
 * <a name="percent-w"></a>
-  Prefer `%w` to the literal array syntax when you need an array of words
-  (non-empty strings without spaces and special characters in them).  Apply this
-  rule only to arrays with two or more elements.
+  Prefer the literal array syntax to the `%w`
 <sup>[[link](#percent-w)]</sup>
 
   ```ruby
-  # bad
+  # bad (confusing and not flexible enough)
+  STATES = %w[draft open closed]
+
+  # good - standard and versatile
   STATES = ['draft', 'open', 'closed']
 
-  # good
-  STATES = %w[draft open closed]
   ```
 
 * <a name="percent-i"></a>
-  Prefer `%i` to the literal array syntax when you need an array of symbols
-  (and you don't need to maintain Ruby 1.9 compatibility). Apply this rule only
-  to arrays with two or more elements.
+  Prefer the literal array over the `%i` when you need an array of symbols.
 <sup>[[link](#percent-i)]</sup>
 
   ```ruby
-  # bad
+  # bad (confusing and not flexible enough)
+  STATES = %i[draft open closed]
+
+  # good - standard and versatile
   STATES = [:draft, :open, :closed]
 
-  # good
-  STATES = %i[draft open closed]
   ```
 
 * <a name="no-trailing-array-commas"></a>
@@ -3444,6 +3559,16 @@ resource cleanup when possible.
 
   # good
   VALUES = [1001, 2020, 3333]
+
+  # good - when many alements and readibility is important
+  STATES = [
+    :slept,
+    :relax,
+    :awake,
+    :attentive,
+    :alert,
+    :ungry
+  ]
   ```
 
 * <a name="no-gappy-arrays"></a>
@@ -3684,13 +3809,14 @@ resource cleanup when possible.
 
   ```ruby
   # bad
-  email_with_name = user.name + ' <' + user.email + '>'
+  email_with_name = user.name + ' < ' + user.email + '>'
 
-  # good
-  email_with_name = "#{user.name} <#{user.email}>"
-
-  # good
+  # bad (hacky, unnecessary)
   email_with_name = format('%s <%s>', user.name, user.email)
+
+  # good
+  email_with_name = "#{user.name} < #{user.email}>"
+
   ```
 
 * <a name="consistent-string-literals"></a>
@@ -3723,6 +3849,8 @@ resource cleanup when possible.
     ```
 
   The string literals in this guide are aligned with the first style.
+
+  I prefer the option B but I am open for agurments in favor of option A.
 
 * <a name="no-character-literals"></a>
   Don't use the character literal syntax `?x`. Since Ruby 1.9 it's basically
@@ -4154,7 +4282,7 @@ resource cleanup when possible.
 ## Metaprogramming
 
 * <a name="no-needless-metaprogramming"></a>
-  Avoid needless metaprogramming.
+  Avoid needless metaprogramming!!
 <sup>[[link](#no-needless-metaprogramming)]</sup>
 
 * <a name="no-monkey-patching"></a>
@@ -4291,6 +4419,84 @@ resource cleanup when possible.
   # Will actually send a message to the receiver obj.
   u2.__send__ ...
   ```
+
+## Testing
+* <a name="native-testing-tools"></a>
+  Use native testing tools when possible. Means: use MiniTest.
+<sup>[[link](#native-testing-tools)]</sup>
+
+* <a name="avoid-scopes"></a>
+  Try to make tests self contained. Avoiding not necessary use of _scopes_.
+<sup>[[link](#avoid-scopes)]</sup>
+  ```ruby
+  # bad (you need to read the setup to understand the tests. If you need customization you star having question marks on the head)
+  class TestMeme < Minitest::Test
+    def setup
+      @meme = Meme.new
+    end
+
+    def test_method_1
+      assert(@meme.method_1?)
+    end
+
+    def test_method_2
+      assert(@meme.method_2?)
+    end
+  end
+
+  # good - each test is independent, customization is clear
+  class TestMeme < Minitest::Test
+    def test_method_1
+      meme = Meme.new
+
+      assert(meme.method_1?)
+    end
+
+    def test_method_2
+      meme = Meme.new
+
+      assert(meme.method_2?)
+    end
+  end
+
+  ```
+
+  The exception is when the setup is too complex and too much reused. Then is better
+  to create an independent test class with this family of tests and use the `scope` for
+  the common initialization.
+
+* <a name="tests-organization"></a>
+  Be strict on the test organization to make to others easy read the test.
+  Be descriptive with the name of the variables. Use `_1`, `_2` fuffix when multiple
+  instances been created.
+<sup>[[link](#native-testing-tools)]</sup>
+  ```ruby
+  # bad
+  def test_method
+    a = Factory.alien
+    a.expects(:attack)
+    a_another = Factory.alien
+    a.land_on_earth
+    assert(a.winner?)
+  end
+
+  # good
+  def test_when_alien_lands_on_earth_should_attach_and_win
+    # context setup
+    alien_1 = Factory.alien
+    alien_2 = Factory.alien
+
+    # expectations
+    alien_1.expects(:attack)
+
+    # code invoked
+    alien_1.land_on_earth
+
+    # assertions
+    assert(alien_1.winner?)
+  end
+  ```
+
 
 ## Misc
 
